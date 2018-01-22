@@ -7,6 +7,7 @@ module Parser exposing
   , delayedCommit, delayedCommitMap
   , source, sourceMap, ignoreUntil
   , Error, Problem(..), Context, inContext
+  , lookAhead
   )
 
 {-|
@@ -21,7 +22,7 @@ module Parser exposing
 @docs Count, zeroOrMore, oneOrMore, keep, ignore, repeat
 
 # Combining Parsers
-@docs succeed, fail, map, oneOf, (|=), (|.), map2, lazy, andThen
+@docs succeed, fail, map, oneOf, (|=), (|.), map2, lazy, andThen, lookAhead
 
 # Delayed Commits
 @docs delayedCommit, delayedCommitMap
@@ -505,6 +506,14 @@ repeatAtLeast n parse revList state1 =
       else
         Bad x state2
 
+
+{-| Run a parser, but don't consume input. -}
+lookAhead : Parser a -> Parser a
+lookAhead (Parser parse) =
+    Parser <| \state ->
+        case parse state of
+            Bad x _ -> Bad x state
+            Good a _ -> Good a state
 
 
 -- DELAYED COMMIT
